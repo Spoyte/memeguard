@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const configSchema = z.object({
-  port: z.coerce.number().default(8000),
+  port: z.coerce.number().default(8004),
 
   // BSC
   bscRpcUrl: z.string().default("https://bsc-dataseed1.binance.org"),

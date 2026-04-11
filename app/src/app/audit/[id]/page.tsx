@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, use } from "react";
 import Link from "next/link";
 
-const ENGINE_URL = process.env.NEXT_PUBLIC_ENGINE_URL || "http://localhost:8000";
+const ENGINE_URL = process.env.NEXT_PUBLIC_ENGINE_URL || "http://localhost:8004";
 
 type Verdict = "SAFE" | "CAUTION" | "RUG";
 type Severity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";

@@ -56,13 +56,13 @@ npm install
 npm run dev
 
 # Engine only
-npm run dev:engine    # → localhost:8000
+npm run dev:engine    # → localhost:8004
 
 # Frontend only
-npm run dev:app       # → localhost:3000
+npm run dev:app       # → localhost:3004
 
 # Audit a token (API)
-curl -X POST http://localhost:8000/audit \
+curl -X POST http://localhost:8004/audit \
   -H "Content-Type: application/json" \
   -d '{"address": "0x..."}'
 ```

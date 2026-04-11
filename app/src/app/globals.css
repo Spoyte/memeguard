@@ -1,0 +1,251 @@
+@import "tailwindcss";
+
+/* ── Design Tokens ── */
+
+:root {
+  /* Colors — Dark cyberpunk/security theme */
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #111118;
+  --bg-card: #16161f;
+  --bg-card-hover: #1c1c28;
+
+  --border: rgba(255, 255, 255, 0.06);
+  --border-light: rgba(255, 255, 255, 0.1);
+
+  /* Verdict colors */
+  --safe: #00e676;
+  --safe-bg: rgba(0, 230, 118, 0.08);
+  --safe-border: rgba(0, 230, 118, 0.2);
+
+  --caution: #ffab00;
+  --caution-bg: rgba(255, 171, 0, 0.08);
+  --caution-border: rgba(255, 171, 0, 0.2);
+
+  --rug: #ff1744;
+  --rug-bg: rgba(255, 23, 68, 0.08);
+  --rug-border: rgba(255, 23, 68, 0.2);
+
+  /* Accent */
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --accent-bg: rgba(99, 102, 241, 0.08);
+
+  /* BSC brand */
+  --bnb: #f0b90b;
+  --bnb-bg: rgba(240, 185, 11, 0.08);
+
+  /* Text */
+  --text-primary: #f0f0f5;
+  --text-secondary: #8b8b9e;
+  --text-muted: #5a5a70;
+
+  /* Shadows */
+  --glow-safe: 0 0 40px rgba(0, 230, 118, 0.15);
+  --glow-caution: 0 0 40px rgba(255, 171, 0, 0.15);
+  --glow-rug: 0 0 40px rgba(255, 23, 68, 0.15);
+  --glow-accent: 0 0 40px rgba(99, 102, 241, 0.15);
+}
+
+/* ── Base Styles ── */
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* ── Custom Scrollbar ── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Glassmorphism Card ── */
+
+.glass-card {
+  background: rgba(22, 22, 31, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.glass-card-hover:hover {
+  background: rgba(28, 28, 40, 0.9);
+  border-color: var(--border-light);
+}
+
+/* ── Gradient Background ── */
+
+.gradient-mesh {
+  background: radial-gradient(
+      ellipse 50% 80% at 20% 40%,
+      rgba(99, 102, 241, 0.06),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 60% 60% at 80% 20%,
+      rgba(240, 185, 11, 0.04),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 40% 40% at 50% 80%,
+      rgba(0, 230, 118, 0.03),
+      transparent
+    );
+}
+
+/* ── Animations ── */
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
+.animate-slide-in {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* ── Verdict Badge Styles ── */
+
+.verdict-safe {
+  color: var(--safe);
+  background: var(--safe-bg);
+  border-color: var(--safe-border);
+  box-shadow: var(--glow-safe);
+}
+
+.verdict-caution {
+  color: var(--caution);
+  background: var(--caution-bg);
+  border-color: var(--caution-border);
+  box-shadow: var(--glow-caution);
+}
+
+.verdict-rug {
+  color: var(--rug);
+  background: var(--rug-bg);
+  border-color: var(--rug-border);
+  box-shadow: var(--glow-rug);
+}
+
+/* ── Score Ring ── */
+
+.score-ring {
+  filter: drop-shadow(0 0 10px currentColor);
+}
+
+/* ── Phase Progress ── */
+
+.phase-line {
+  background: linear-gradient(
+    to bottom,
+    var(--accent),
+    transparent
+  );
+}
+
+/* ── Input ── */
+
+.search-input {
+  background: rgba(22, 22, 31, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1),
+    var(--glow-accent);
+  outline: none;
+}

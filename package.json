@@ -1,0 +1,21 @@
+{
+  "name": "memeguard",
+  "version": "0.0.1",
+  "private": true,
+  "description": "AI-powered meme token security auditor for BSC",
+  "workspaces": [
+    "engine",
+    "app"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:engine\" \"npm run dev:app\"",
+    "dev:engine": "npm run dev --workspace=engine",
+    "dev:app": "npm run dev --workspace=app",
+    "build": "npm run build --workspace=app",
+    "lint": "npm run lint --workspace=engine && npm run lint --workspace=app"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.8.3"
+  }
+}

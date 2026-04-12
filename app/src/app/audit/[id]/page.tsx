@@ -82,51 +82,145 @@ export default function AuditPage({
   const [loading, setLoading] = useState(true);
   const feedRef = useRef<HTMLDivElement>(null);
 
-  // Fetch report
+  // Fetch report and setup SSE
   useEffect(() => {
+    const syncReportData = (data: any) => {
+      if (!data.verdict) return;
+      
+      setReport(data);
+      setLoading(false);
+
+      if (data.phases) {
+        setPhases(
+          data.phases.map((p: any) => ({
+            phase: p.phase,
+            name: p.name,
+            status: p.skipped ? "skipped" : "complete",
+            score: p.score,
+            duration: p.duration,
+            reason: p.skipReason,
+          }))
+        );
+
+        const allFlags: RiskFlag[] = [];
+        const allFindings: Finding[] = [];
+        for (const p of data.phases) {
+          if (p.flags) allFlags.push(...p.flags);
+          if (p.findings) allFindings.push(...p.findings);
+          if (p.simulation) setSimulation(p.simulation);
+        }
+        setFlags(allFlags);
+        setFindings(allFindings);
+      }
+    };
+
     const fetchReport = async () => {
       try {
         const res = await fetch(`${ENGINE_URL}/audit/${id}/report`);
         if (res.ok) {
           const data = await res.json();
-          if (data.verdict) {
-            setReport(data);
-            setLoading(false);
-
-            // Populate phases from report
-            if (data.phases) {
-              setPhases(
-                data.phases.map((p: any) => ({
-                  phase: p.phase,
-                  name: p.name,
-                  status: p.skipped ? "skipped" : "complete",
-                  score: p.score,
-                  duration: p.duration,
-                  reason: p.skipReason,
-                }))
-              );
-
-              // Collect all flags and findings
-              const allFlags: RiskFlag[] = [];
-              const allFindings: Finding[] = [];
-              for (const p of data.phases) {
-                if (p.flags) allFlags.push(...p.flags);
-                if (p.findings) allFindings.push(...p.findings);
-                if (p.simulation) setSimulation(p.simulation);
-              }
-              setFlags(allFlags);
-              setFindings(allFindings);
-            }
-          }
+          syncReportData(data);
         }
       } catch (err) {
         console.error("Failed to fetch report:", err);
       }
     };
 
+    // Initial fetch to get completed data if any
     fetchReport();
-    const interval = setInterval(fetchReport, 3000);
-    return () => clearInterval(interval);
+
+    // Setup SSE connection
+    const eventSource = new EventSource(`${ENGINE_URL}/audit/${id}/events`);
+
+    eventSource.addEventListener("phase:start", (e) => {
+      const data = JSON.parse(e.data);
+      setPhases((prev) =>
+        prev.map((p) =>
+          p.phase === data.phase ? { ...p, status: "running" } : p
+        )
+      );
+    });
+
+    eventSource.addEventListener("phase:complete", (e) => {
+      const data = JSON.parse(e.data);
+      setPhases((prev) =>
+        prev.map((p) =>
+          p.phase === data.phase
+            ? { ...p, status: "complete", score: data.score, duration: data.duration }
+            : p
+        )
+      );
+    });
+
+    eventSource.addEventListener("phase:skip", (e) => {
+      const data = JSON.parse(e.data);
+      setPhases((prev) =>
+        prev.map((p) =>
+          p.phase === data.phase
+            ? { ...p, status: "skipped", reason: data.reason }
+            : p
+        )
+      );
+    });
+
+    eventSource.addEventListener("flag:found", (e) => {
+      const data = JSON.parse(e.data);
+      setFlags((prev) => {
+        if (prev.some((f) => f.id === data.flag.id)) return prev;
+        return [...prev, data.flag];
+      });
+    });
+
+    eventSource.addEventListener("finding:found", (e) => {
+      const data = JSON.parse(e.data);
+      setFindings((prev) => {
+        if (prev.some((f) => f.id === data.finding.id)) return prev;
+        return [...prev, data.finding];
+      });
+    });
+
+    eventSource.addEventListener("simulation:result", (e) => {
+      const data = JSON.parse(e.data);
+      setSimulation(data.result);
+    });
+
+    eventSource.addEventListener("investigation:step", (e) => {
+      const data = JSON.parse(e.data);
+      setEvents((prev) => [
+        ...prev,
+        { type: "step", text: `${data.step}: ${data.detail}`, time: data.timestamp },
+      ]);
+    });
+
+    eventSource.addEventListener("triage:reasoning", (e) => {
+      const data = JSON.parse(e.data);
+      setEvents((prev) => [
+        ...prev,
+        { type: "info", text: `AI: ${data.reasoning}`, time: data.timestamp },
+      ]);
+    });
+
+    eventSource.addEventListener("audit:complete", () => {
+      fetchReport(); // Fetch final compiled report
+      eventSource.close();
+    });
+
+    eventSource.addEventListener("audit:error", (e) => {
+      console.error("Audit error:", e.data);
+      setLoading(false);
+      eventSource.close();
+    });
+
+    eventSource.onerror = () => {
+      eventSource.close();
+      // On connection error, fallback to polling
+      const interval = setInterval(fetchReport, 3000);
+      return () => clearInterval(interval);
+    };
+
+    return () => {
+      eventSource.close();
+    };
   }, [id]);
 
   // Auto-scroll feed

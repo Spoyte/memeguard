@@ -2,10 +2,8 @@ import {
   createPublicClient,
   http,
   parseAbi,
-  encodeFunctionData,
-  decodeFunctionResult,
+  getAddress,
   type Address,
-  type Hex,
   formatUnits,
 } from "viem";
 import { bsc } from "viem/chains";
@@ -15,9 +13,9 @@ import { emit } from "../events.js";
 
 // ── Constants ──
 
-const PANCAKE_ROUTER_V2 = "0x10ED43C718714eb63d5aA57B78B54917c3F0aeD2" as Address;
-const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" as Address;
-const PANCAKE_FACTORY_V2 = "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73" as Address;
+const PANCAKE_ROUTER_V2 = getAddress("0x10ED43C718714eb63d5aA57B78B54917c3F0aeD2");
+const WBNB = getAddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
+const PANCAKE_FACTORY_V2 = getAddress("0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73");
 
 const ROUTER_ABI = parseAbi([
   "function getAmountsOut(uint256 amountIn, address[] calldata path) external view returns (uint256[] memory amounts)",

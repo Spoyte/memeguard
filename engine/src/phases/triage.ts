@@ -1,7 +1,6 @@
 import type { Address } from "viem";
 import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
-import { anthropic } from "@ai-sdk/anthropic";
 import { config } from "../config.js";
 import type { Finding, PhaseResult, RiskFlag } from "../models.js";
 import { emit } from "../events.js";
@@ -92,10 +91,11 @@ Respond in this exact JSON format:
 Be precise. Don't flag standard ERC-20 patterns as risky. Focus on patterns that are actually dangerous.`;
 
   try {
-    // Select model — prefer Gemini Flash for speed/cost
-    const model = config.googleApiKey
-      ? google(config.triageModel)
-      : anthropic(config.investigationModel);
+    // Select model — require Gemini for Phase 2 (fast/cheap)
+    if (!config.googleApiKey) {
+      throw new Error("Google Generative AI API key required for Phase 2 triage");
+    }
+    const model = google(config.triageModel);
 
     const { text } = await generateText({
       model,

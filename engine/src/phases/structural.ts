@@ -232,26 +232,8 @@ export async function structuralTriage(
     });
   }
 
-  // Check for self-destruct opcode (could destroy contract + LP)
-  // Scan for SELFDESTRUCT (0xFF) in executable context
-  // This is a rough heuristic — FF appears in many contexts
-  // We look for it preceded by CALLER (0x33) or a push pattern
-  if (bytecodeHex.match(/(?:33|73[0-9a-f]{40})ff/)) {
-    flags.push({
-      id: "SELF_DESTRUCT",
-      severity: "CRITICAL",
-      category: "OWNERSHIP",
-      title: "Self-Destruct Capability",
-      description:
-        "Contract can self-destruct, destroying the token and any locked liquidity.",
-      evidence: "SELFDESTRUCT opcode pattern detected in bytecode",
-    });
-    emit(sessionId, {
-      type: "flag:found",
-      flag: flags[flags.length - 1],
-      timestamp: Date.now(),
-    });
-  }
+  // Note: SELFDESTRUCT (0xFF) detection removed — too many false positives
+  // in raw bytecode. We check for it in verified source code instead.
 
   // ── Source code analysis (if available) ──
 

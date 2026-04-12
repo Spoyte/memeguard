@@ -1,3 +1,4 @@
+import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { streamSSE } from "hono/streaming";
@@ -205,7 +206,12 @@ console.log(`
 ╚══════════════════════════════════════════════╝
 `);
 
-export default {
-  port,
-  fetch: app.fetch,
-};
+serve(
+  {
+    fetch: app.fetch,
+    port,
+  },
+  () => {
+    console.log(`🚀 Engine listening on http://localhost:${port}`);
+  }
+);

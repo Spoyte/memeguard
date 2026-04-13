@@ -13,7 +13,24 @@ const app = new Hono();
 
 // ── Middleware ──
 
-app.use("/*", cors());
+app.use(
+  "/*",
+  cors({
+    origin: (origin) => {
+      // Allow localhost dev, Vercel previews, and production domain
+      if (!origin) return origin; // non-browser requests
+      if (origin.startsWith("http://localhost")) return origin;
+      if (origin.endsWith(".vercel.app")) return origin;
+      if (origin === "https://memeguard.vercel.app") return origin;
+      // Allow configured frontend URL
+      const allowed = process.env.FRONTEND_URL;
+      if (allowed && origin === allowed) return origin;
+      return undefined;
+    },
+    allowMethods: ["GET", "POST", "OPTIONS"],
+    allowHeaders: ["Content-Type"],
+  })
+);
 
 // ── State ──
 

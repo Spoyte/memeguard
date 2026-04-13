@@ -211,15 +211,21 @@ export default function AuditPage({
       eventSource.close();
     });
 
+    let fallbackInterval: ReturnType<typeof setInterval> | null = null;
+
     eventSource.onerror = () => {
       eventSource.close();
-      // On connection error, fallback to polling
-      const interval = setInterval(fetchReport, 3000);
-      return () => clearInterval(interval);
+      // On connection error, fallback to polling until report lands
+      if (!fallbackInterval) {
+        fallbackInterval = setInterval(async () => {
+          await fetchReport();
+        }, 3000);
+      }
     };
 
     return () => {
       eventSource.close();
+      if (fallbackInterval) clearInterval(fallbackInterval);
     };
   }, [id]);
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const configSchema = z.object({
-  port: z.coerce.number().default(8004),
+  port: z.coerce.number().default(8004),  // Railway injects PORT
 
   // BSC
   bscRpcUrl: z.string().default("https://bsc-dataseed1.binance.org"),
@@ -29,7 +29,7 @@ export type Config = z.infer<typeof configSchema>;
 
 export function loadConfig(): Config {
   return configSchema.parse({
-    port: process.env.MEMEGUARD_PORT,
+    port: process.env.PORT || process.env.MEMEGUARD_PORT,
     bscRpcUrl: process.env.BSC_RPC_URL,
     bscTestnetRpcUrl: process.env.BSC_TESTNET_RPC_URL,
     bscscanApiKey: process.env.BSCSCAN_API_KEY,

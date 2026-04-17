@@ -40,7 +40,7 @@ export async function deepInvestigation(
       description: "Read the verified source code of the contract. Returns the full source or null if not verified.",
       parameters: z.object({}),
       execute: async () => {
-        return { source: source || "Source code not verified on BscScan" };
+        return { source: source || "Source code not verified on Etherscan" };
       },
     }),
 
@@ -80,13 +80,13 @@ export async function deepInvestigation(
       description: "Get information about the top token holders (simulated via balance checks of known addresses).",
       parameters: z.object({}),
       execute: async () => {
-        // In production, we'd use BscScan API for top holders
+        // Use Etherscan V2 API for top holders
         // For now, return basic info
         try {
           if (!config.bscscanApiKey) {
-            return { note: "BscScan API key not configured. Cannot fetch holder data." };
+            return { note: "Etherscan API key not configured. Cannot fetch holder data." };
           }
-          const url = `https://api.bscscan.com/api?module=token&action=tokenholderlist&contractaddress=${address}&page=1&offset=10&apikey=${config.bscscanApiKey}`;
+          const url = `https://api.etherscan.io/v2/api?chainid=56&module=token&action=tokenholderlist&contractaddress=${address}&page=1&offset=10&apikey=${config.bscscanApiKey}`;
           const res = await fetch(url);
           const data = await res.json();
           return data;
@@ -104,9 +104,9 @@ export async function deepInvestigation(
       execute: async ({ ownerAddress }) => {
         try {
           if (!config.bscscanApiKey) {
-            return { note: "BscScan API key not configured." };
+            return { note: "Etherscan API key not configured." };
           }
-          const url = `https://api.bscscan.com/api?module=account&action=txlist&address=${ownerAddress}&startblock=0&endblock=99999999&page=1&offset=20&sort=desc&apikey=${config.bscscanApiKey}`;
+          const url = `https://api.etherscan.io/v2/api?chainid=56&module=account&action=txlist&address=${ownerAddress}&startblock=0&endblock=99999999&page=1&offset=20&sort=desc&apikey=${config.bscscanApiKey}`;
           const res = await fetch(url);
           const data = await res.json();
           return data;

@@ -11,6 +11,9 @@ import { bsc, bscTestnet } from "viem/chains";
 import { config } from "../config.js";
 import type { TokenInfo } from "../models.js";
 
+// Etherscan V2 unified API (replaces deprecated api.bscscan.com)
+const ETHERSCAN_V2_BASE = "https://api.etherscan.io/v2/api?chainid=56";
+
 // ── BSC Client Factory ──
 
 export function getBscClient(chainId: number = 56): PublicClient {
@@ -73,11 +76,11 @@ export async function resolveToken(
   let deployedAt: number | undefined;
   let deployer: string | undefined;
 
-  // Check if source is verified on BscScan
+  // Check if source is verified (Etherscan V2)
   let hasVerifiedSource = false;
   if (config.bscscanApiKey) {
     try {
-      const url = `https://api.bscscan.com/api?module=contract&action=getsourcecode&address=${address}&apikey=${config.bscscanApiKey}`;
+      const url = `${ETHERSCAN_V2_BASE}&module=contract&action=getsourcecode&address=${address}&apikey=${config.bscscanApiKey}`;
       const res = await fetch(url);
       const data = (await res.json()) as {
         result: Array<{ SourceCode: string }>;
@@ -86,7 +89,7 @@ export async function resolveToken(
         data.result?.[0]?.SourceCode !== "" &&
         data.result?.[0]?.SourceCode !== undefined;
     } catch {
-      // BscScan API failure — non-fatal
+      // Etherscan API failure — non-fatal
     }
   }
 
@@ -123,7 +126,7 @@ export async function fetchBytecode(
   return code;
 }
 
-// ── Fetch Verified Source (BscScan) ──
+// ── Fetch Verified Source (Etherscan V2) ──
 
 export async function fetchVerifiedSource(
   address: Address
@@ -131,7 +134,7 @@ export async function fetchVerifiedSource(
   if (!config.bscscanApiKey) return null;
 
   try {
-    const url = `https://api.bscscan.com/api?module=contract&action=getsourcecode&address=${address}&apikey=${config.bscscanApiKey}`;
+    const url = `${ETHERSCAN_V2_BASE}&module=contract&action=getsourcecode&address=${address}&apikey=${config.bscscanApiKey}`;
     const res = await fetch(url);
     const data = (await res.json()) as {
       result: Array<{
@@ -149,7 +152,7 @@ export async function fetchVerifiedSource(
   }
 }
 
-// ── Fetch ABI (BscScan) ──
+// ── Fetch ABI (Etherscan V2) ──
 
 export async function fetchVerifiedABI(
   address: Address
@@ -157,7 +160,7 @@ export async function fetchVerifiedABI(
   if (!config.bscscanApiKey) return null;
 
   try {
-    const url = `https://api.bscscan.com/api?module=contract&action=getabi&address=${address}&apikey=${config.bscscanApiKey}`;
+    const url = `${ETHERSCAN_V2_BASE}&module=contract&action=getabi&address=${address}&apikey=${config.bscscanApiKey}`;
     const res = await fetch(url);
     const data = (await res.json()) as { result: string; status: string };
 

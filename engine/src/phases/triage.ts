@@ -55,7 +55,7 @@ export async function aiTriage(
     // Provide bytecode snippet (first 2KB)
     const truncatedBytecode = bytecode.substring(0, 4096);
     contextParts.push(``, `## Bytecode (first 2KB)`, "```", truncatedBytecode, "```");
-    contextParts.push(``, `> Source code is NOT verified on BscScan. This is itself a risk factor.`);
+    contextParts.push(``, `> Source code is NOT verified on Etherscan. This is itself a risk factor.`);
   }
 
   const systemPrompt = `You are a BSC meme token security expert. Your job is to analyze token contracts and score their risk level.

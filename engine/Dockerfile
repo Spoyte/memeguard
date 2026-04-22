@@ -2,12 +2,12 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Install dependencies
-COPY package.json ./
+COPY engine/package.json ./
 RUN npm install --production=false
 
 # Copy source
-COPY tsconfig.json ./
-COPY src/ ./src/
+COPY engine/tsconfig.json ./
+COPY engine/src/ ./src/
 
 # Run with tsx (avoids ESM compilation issues with tsc)
 ENV NODE_ENV=production

@@ -228,7 +228,7 @@ serve(
   {
     fetch: app.fetch,
     port,
-    hostname: "0.0.0.0",
+    hostname: "::",
   },
   () => {
     console.log(`🚀 Engine listening on http://localhost:${port}`);

@@ -11,7 +11,6 @@ COPY engine/src/ ./src/
 
 # Run with tsx (avoids ESM compilation issues with tsc)
 ENV NODE_ENV=production
-EXPOSE 8004
 
 # Non-root user
 RUN addgroup -g 1001 -S nodejs && \

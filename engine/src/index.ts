@@ -71,6 +71,7 @@ async function processQueue() {
 // ── Routes ──
 
 // Health check
+app.get("/", (c) => c.text("OK"));
 app.get("/health", (c) => {
   return c.json({
     status: "ok",
